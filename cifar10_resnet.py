@@ -44,15 +44,21 @@ version = 1
 activation_bits = int(sys.argv[1])
 if len(sys.argv) == 2:
     weight_noise = None
+    ##
+    bias_noise = None
+    ##
     model_name = 'act%db_wnoiseNone' % activation_bits
 else:
     weight_noise = float(sys.argv[2])
+    ###
+    bias_noise = float(sys.argv[3])
+    ###
     model_name = 'act%db_wnoise%.2f' % (activation_bits, weight_noise)
 
-if len(sys.argv) >= 4:
-    version = int(sys.argv[3])
 if len(sys.argv) >= 5:
-    n = int(sys.argv[4])
+    version = int(sys.argv[4])
+if len(sys.argv) >= 6:
+    n = int(sys.argv[5])
 
 
 # Computed depth from supplied model parameter n
@@ -136,7 +142,9 @@ else:
                         depth=depth,
                         activation_bits=activation_bits,
                         weight_noise_train=weight_noise,
+                        bias_noise_train = bias_noise,
                         weight_noise_test=0.0,
+                        bias_noise_test = 0.0,
                         relu_decay=1e-3,
                         trainable_conv=not finetune,
                         trainable_dense=True)
@@ -145,7 +153,9 @@ else:
                         depth=depth,
                         activation_bits=activation_bits,
                         weight_noise_train=weight_noise,
+                        bias_noise_train = bias_noise,
                         weight_noise_test=0.0,
+                        bias_noise_test = 0.0,
                         relu_decay=0.0,
                         trainable_conv=not finetune,
                         trainable_dense=True)

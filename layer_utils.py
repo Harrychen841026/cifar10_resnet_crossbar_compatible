@@ -39,11 +39,13 @@ class activation_quant(Layer):
     
 class conv2d_noise(Layer):
     def __init__(self, num_filter, kernel_size=3, activation=None, strides=1, padding='valid',
-                 noise_train=0., noise_test=0., num_bits=None, weight_range=1., bias_range=1.,
+                 noise_train=0., b_noise_train = 0., noise_test=0.,b_noise_test = 0., num_bits=None, weight_range=1., bias_range=1.,
                  range_decay=0, **kwargs):
         super(conv2d_noise, self).__init__(**kwargs)
         self.num_filter = num_filter
+        self.b_noise_train = b_noise_train
         self.noise_train = noise_train
+        self.b_noise_test = b_noise_test
         self.noise_test = noise_test
         self.kernel_size = (kernel_size, kernel_size)
         self.activation = activation
@@ -61,16 +63,16 @@ class conv2d_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=(self.num_filter,),
-                                    initializer=keras.initializers.Zeros())
+                                    initializer='glorot_uniform')
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
                                                 shape=[],
                                                 regularizer=tf.keras.regularizers.l2(self.range_decay),
                                                 initializer=keras.initializers.Constant(self.weight_range))
-            # self.bias_range = self.add_weight(name='bias_range',
-            #                                   shape=[],
-            #                                   regularizer=tf.keras.regularizers.l2(self.range_decay),
-            #                                   initializer=keras.initializers.Constant(self.bias_range))
+            self.bias_range = self.add_weight(name='bias_range',
+                                               shape=[],
+                                               regularizer=tf.keras.regularizers.l2(self.range_decay),
+                                               initializer=keras.initializers.Constant(self.bias_range))
         
     def call(self, x, training=None):
         weights = self.kernel
@@ -84,17 +86,18 @@ class conv2d_noise(Layer):
                 max=self.weight_range,
                 num_bits=self.num_bits,
                 narrow_range=True)
-            # bias = tf.quantization.fake_quant_with_min_max_vars(
-            #     bias,
-            #     min=-self.bias_range,
-            #     max=self.bias_range,
-            #     num_bits=self.num_bits,
-            #     narrow_range=True)
+            bias = tf.quantization.fake_quant_with_min_max_vars(
+                bias,
+                min=-self.bias_range,
+                max=self.bias_range,
+                num_bits=self.num_bits,
+                narrow_range=True)
         noise_magnitude = self.noise_train if training else self.noise_test
+        b_noise_magnitude = self.b_noise_train if training else self.b_noise_test
         if noise_magnitude is not None and noise_magnitude > 0:
             w_max = K.max(K.abs(weights))
             weights = weights + tf.random.normal(self.kernel.shape, mean=0, stddev=w_max * noise_magnitude)
-            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * noise_magnitude)
+            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * b_noise_magnitude)
         act = K.conv2d(x, weights, strides=self.strides, padding=self.padding)
         act = K.bias_add(act, bias)
         if self.activation == 'relu':
@@ -108,11 +111,13 @@ class conv2d_noise(Layer):
 
     
 class dense_noise(Layer):
-    def __init__(self, output_dim, activation=None, noise_train=0., noise_test=0.,
+    def __init__(self, output_dim, activation=None, noise_train=0., b_noise_train = 0., noise_test=0., b_noise_test = 0.,
                  num_bits=None, weight_range=1., bias_range=1., range_decay=0, **kwargs):
         super(dense_noise, self).__init__(**kwargs)
         self.output_dim = output_dim
+        self.b_noise_train = b_noise_train
         self.noise_train = noise_train
+        self.b_noise_test = b_noise_test
         self.noise_test = noise_test
         self.activation = activation
         self.num_bits = num_bits
@@ -127,16 +132,16 @@ class dense_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=[int(self.output_dim)],
-                                    initializer=keras.initializers.Zeros())
+                                    initializer='glorot_uniform')
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
                                                 shape=[],
                                                 regularizer=tf.keras.regularizers.l2(self.range_decay),
                                                 initializer=keras.initializers.Constant(self.weight_range))
-            # self.bias_range = self.add_weight(name='bias_range',
-            #                                   shape=[],
-            #                                   regularizer=tf.keras.regularizers.l2(self.range_decay),
-            #                                   initializer=keras.initializers.Constant(self.bias_range))
+            self.bias_range = self.add_weight(name='bias_range',
+                                               shape=[],
+                                               regularizer=tf.keras.regularizers.l2(self.range_decay),
+                                               initializer=keras.initializers.Constant(self.bias_range))
         
     def call(self, x, training=None):
         weights = self.kernel
@@ -150,17 +155,18 @@ class dense_noise(Layer):
                 max=self.weight_range,
                 num_bits=self.num_bits,
                 narrow_range=True)
-            # bias = tf.quantization.fake_quant_with_min_max_vars(
-            #     bias,
-            #     min=-self.bias_range,
-            #     max=self.bias_range,
-            #     num_bits=self.num_bits,
-            #     narrow_range=True)
+            bias = tf.quantization.fake_quant_with_min_max_vars(
+                 bias,
+                 min=-self.bias_range,
+                 max=self.bias_range,
+                 num_bits=self.num_bits,
+                 narrow_range=True)
         noise_magnitude = self.noise_train if training else self.noise_test
+        b_noise_magnitude = self.b_noise_train if training else self.b_noise_test
         if noise_magnitude is not None and noise_magnitude > 0:
             w_max = K.max(K.abs(weights))
             weights = weights + tf.random.normal(self.kernel.shape, mean=0, stddev=w_max * noise_magnitude)
-            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * noise_magnitude)
+            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * b_noise_magnitude)
         act = K.dot(x, weights) + bias
         if self.activation == 'relu':
             act = K.relu(act)

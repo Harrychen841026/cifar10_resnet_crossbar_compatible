@@ -15,7 +15,9 @@ def resnet_layer(inputs,
                  batch_normalization=True,
                  conv_first=True,
                  activation_bits=None,
+                 bias_noise_train = None,
                  weight_noise_train=None,
+                 bias_noise_test = None,
                  weight_noise_test=None,
                  weight_bits=None,
                  trainable=True):
@@ -48,7 +50,9 @@ def resnet_layer(inputs,
                             strides=strides,
                             padding='same',
                             noise_train=weight_noise_train,
+                            b_noise_train = bias_noise_train,
                             noise_test=weight_noise_test,
+                            b_noise_test = bias_noise_test,
                             num_bits=weight_bits,
                             trainable=trainable)
 
@@ -74,7 +78,10 @@ def resnet_layer(inputs,
     return x
 
 
-def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_decay=0.0, weight_noise_train=None, weight_noise_test=None,
+def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_decay=0.0, bias_noise_train = None,
+                 weight_noise_train=None,
+                 bias_noise_test = None,
+                 weight_noise_test=None,
               weight_bits=None, trainable_conv=True, trainable_dense=True):
     """ResNet Version 1 Model builder [a]
 
@@ -115,7 +122,9 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                      num_filters=num_filters,
                      activation_bits=activation_bits,
                      relu_decay=relu_decay,
+                     bias_noise_train = bias_noise_train,
                      weight_noise_train=weight_noise_train,
+                     bias_noise_test = bias_noise_test,
                      weight_noise_test=weight_noise_test,
                      weight_bits=weight_bits,
                      trainable=trainable_conv)
@@ -130,7 +139,9 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              strides=strides,
                              activation_bits=activation_bits,
                              relu_decay=relu_decay,
+                             bias_noise_train = bias_noise_train,
                              weight_noise_train=weight_noise_train,
+                             bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
                              trainable=trainable_conv)
@@ -138,7 +149,9 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              num_filters=num_filters,
                              activation=None,
                              activation_bits=activation_bits,
+                             bias_noise_train = bias_noise_train,
                              weight_noise_train=weight_noise_train,
+                             bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
                              trainable=trainable_conv)
@@ -152,7 +165,9 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                                  activation=None,
                                  batch_normalization=False,
                                  activation_bits=activation_bits,
+                                 bias_noise_train = bias_noise_train,
                                  weight_noise_train=weight_noise_train,
+                                 bias_noise_test = bias_noise_test,
                                  weight_noise_test=weight_noise_test,
                                  weight_bits=weight_bits,
                                  trainable=trainable_conv)
@@ -178,7 +193,9 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
         outputs = dense_noise(num_classes,
                               activation='softmax',
                               noise_train=weight_noise_train,
+                              b_noise_train = bias_noise_train,
                               noise_test=weight_noise_test,
+                              b_noise_test = bias_noise_test,
                               num_bits=weight_bits,
                               trainable=trainable_dense)(y)
 
@@ -227,7 +244,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                      conv_first=True,
                      activation_bits=activation_bits,
                      relu_decay=relu_decay,
+                     bias_noise_train = bias_noise_train,
                      weight_noise_train=weight_noise_train,
+                     bias_noise_test = bias_noise_test,
                      weight_noise_test=weight_noise_test,
                      weight_bits=weight_bits,
                      trainable=trainable_conv)
@@ -267,7 +286,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              conv_first=False,
                              activation_bits=activation_bits,
                              relu_decay=relu_decay,
+                             bias_noise_train = bias_noise_train,
                      		 weight_noise_train=weight_noise_train,
+                             bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
                              trainable=trainable_conv)
@@ -277,7 +298,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              conv_first=False,
                              activation_bits=activation_bits,
                              relu_decay=relu_decay,
+                             bias_noise_train = bias_noise_train,
                      		 weight_noise_train=weight_noise_train,
+                             bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
                              trainable=trainable_conv)
@@ -291,7 +314,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                                  activation=None,
                                  batch_normalization=False,
                                  activation_bits=activation_bits,
+                                 bias_noise_train = bias_noise_train,
                      			 weight_noise_train=weight_noise_train,
+                                 bias_noise_test = bias_noise_test,
                                  weight_noise_test=weight_noise_test,
                                  weight_bits=weight_bits,
                                  trainable=trainable_conv)
@@ -317,7 +342,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
         outputs = dense_noise(num_classes,
                               activation='softmax',
                               noise_train=weight_noise_train,
+                              b_noise_train = bias_noise_train,
                               noise_test=weight_noise_test,
+                              b_noise_test = bias_noise_test,
                               num_bits=weight_bits,
                               trainable=trainable_dense)(y)
 
