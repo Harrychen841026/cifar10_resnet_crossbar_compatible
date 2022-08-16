@@ -204,7 +204,10 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
     return model
 
 
-def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_decay=0.0, weight_noise_train=None, weight_noise_test=None,
+def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_decay=0.0, bias_noise_train = None,
+                 weight_noise_train=None,
+                 bias_noise_test = None,
+                 weight_noise_test=None,
               weight_bits=None, trainable_conv=True, trainable_dense=True):
     """ResNet Version 2 Model builder [b]
 
@@ -277,7 +280,9 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              conv_first=False,
                              activation_bits=activation_bits,
                              relu_decay=relu_decay,
+                             bias_noise_train = bias_noise_train,
                      		 weight_noise_train=weight_noise_train,
+                             bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
                              trainable=trainable_conv)

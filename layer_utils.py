@@ -96,8 +96,9 @@ class conv2d_noise(Layer):
         b_noise_magnitude = self.b_noise_train if training else self.b_noise_test
         if noise_magnitude is not None and noise_magnitude > 0:
             w_max = K.max(K.abs(weights))
+            b_max = K.max(K.abs(bias))
             weights = weights + tf.random.normal(self.kernel.shape, mean=0, stddev=w_max * noise_magnitude)
-            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * b_noise_magnitude)
+            bias = bias + tf.random.normal(self.bias.shape, stddev=b_max * b_noise_magnitude)
         act = K.conv2d(x, weights, strides=self.strides, padding=self.padding)
         act = K.bias_add(act, bias)
         if self.activation == 'relu':
@@ -165,8 +166,9 @@ class dense_noise(Layer):
         b_noise_magnitude = self.b_noise_train if training else self.b_noise_test
         if noise_magnitude is not None and noise_magnitude > 0:
             w_max = K.max(K.abs(weights))
+            b_max = K.max(K.abs(bias))
             weights = weights + tf.random.normal(self.kernel.shape, mean=0, stddev=w_max * noise_magnitude)
-            bias = bias + tf.random.normal(self.bias.shape, stddev=w_max * b_noise_magnitude)
+            bias = bias + tf.random.normal(self.bias.shape, stddev=b_max * b_noise_magnitude)
         act = K.dot(x, weights) + bias
         if self.activation == 'relu':
             act = K.relu(act)

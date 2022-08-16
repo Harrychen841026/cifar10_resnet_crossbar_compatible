@@ -96,8 +96,8 @@ print('y_train shape:', y_train.shape)
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
-x_train = quantize_rescale(quantize_unsigned(x_train, 4, 0.95), 4, 0.95)
-x_test = quantize_rescale(quantize_unsigned(x_test, 4, 0.95), 4, 0.95)
+x_train = quantize_rescale(quantize_unsigned(x_train, 3, 0.95), 3, 0.95)
+x_test = quantize_rescale(quantize_unsigned(x_test, 3, 0.95), 3, 0.95)
 
 
 def lr_schedule(epoch):
