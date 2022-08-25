@@ -53,7 +53,7 @@ else:
     ###
     bias_noise = float(sys.argv[3])
     ###
-    model_name = 'act%db_wnoise%.2f' % (activation_bits, weight_noise)
+    model_name = 'act%db_wnoise%.2f_bnoise%.2f' % (activation_bits, weight_noise,bias_noise)
 
 if len(sys.argv) >= 5:
     version = int(sys.argv[4])
