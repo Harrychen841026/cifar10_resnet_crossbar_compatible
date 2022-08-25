@@ -13,7 +13,6 @@ def resnet_layer(inputs,
                  activation='relu',
                  relu_decay=0.0,
                  batch_normalization=True,
-                 b_init = keras.initializers.Zeros(),
                  conv_first=True,
                  activation_bits=None,
                  bias_noise_train = None,
@@ -54,7 +53,6 @@ def resnet_layer(inputs,
                             b_noise_train = bias_noise_train,
                             noise_test=weight_noise_test,
                             b_noise_test = bias_noise_test,
-                            b_init= b_init,
                             num_bits=weight_bits,
                             trainable=trainable)
 
@@ -84,7 +82,7 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                  weight_noise_train=None,
                  bias_noise_test = None,
                  weight_noise_test=None,
-              weight_bits=None, b_init = keras.initializers.Zeros(), trainable_conv=True, trainable_dense=True):
+              weight_bits=None,  trainable_conv=True, trainable_dense=True):
     """ResNet Version 1 Model builder [a]
 
     Stacks of 2 x (3 x 3) Conv2D-BN-ReLU
@@ -129,7 +127,6 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                      bias_noise_test = bias_noise_test,
                      weight_noise_test=weight_noise_test,
                      weight_bits=weight_bits,
-                     b_init=b_init,
                      trainable=trainable_conv)
     # Instantiate the stack of residual units
     for stack in range(3):
@@ -147,7 +144,6 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
-                             b_init=b_init,
                              trainable=trainable_conv)
             y = resnet_layer(inputs=y,
                              num_filters=num_filters,
@@ -158,7 +154,6 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
-                             b_init=b_init,
                              trainable=trainable_conv)
             if stack > 0 and res_block == 0:  # first layer but not first stack
                 # linear projection residual shortcut connection to match
@@ -175,7 +170,6 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                                  bias_noise_test = bias_noise_test,
                                  weight_noise_test=weight_noise_test,
                                  weight_bits=weight_bits,
-                                 b_init=b_init,
                                  trainable=trainable_conv)
             x = keras.layers.add([x, y])
             if (activation_bits is None) or (stack == 2 and res_block == num_res_blocks - 1):
@@ -203,7 +197,6 @@ def resnet_v1(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                               noise_test=weight_noise_test,
                               b_noise_test = bias_noise_test,
                               num_bits=weight_bits,
-                              b_init=b_init,
                               trainable=trainable_dense)(y)
 
     # Instantiate model.
@@ -215,7 +208,7 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                  weight_noise_train=None,
                  bias_noise_test = None,
                  weight_noise_test=None,
-              weight_bits=None, b_init=keras.initializers.Zeros(), trainable_conv=True, trainable_dense=True):
+              weight_bits=None,  trainable_conv=True, trainable_dense=True):
     """ResNet Version 2 Model builder [b]
 
     Stacks of (1 x 1)-(3 x 3)-(1 x 1) BN-ReLU-Conv2D or also known as
@@ -259,7 +252,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                      bias_noise_test = bias_noise_test,
                      weight_noise_test=weight_noise_test,
                      weight_bits=weight_bits,
-                     b_init=b_init,
                      trainable=trainable_conv)
 
     # Instantiate the stack of residual units
@@ -293,7 +285,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
-                             b_init=b_init,
                              trainable=trainable_conv)
             y = resnet_layer(inputs=y,
                              num_filters=num_filters_in,
@@ -305,7 +296,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
-                             b_init=b_init,
                              trainable=trainable_conv)
             y = resnet_layer(inputs=y,
                              num_filters=num_filters_out,
@@ -318,7 +308,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                              bias_noise_test = bias_noise_test,
                              weight_noise_test=weight_noise_test,
                              weight_bits=weight_bits,
-                             b_init=b_init,
                              trainable=trainable_conv)
             if res_block == 0:
                 # linear projection residual shortcut connection to match
@@ -335,7 +324,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                                  bias_noise_test = bias_noise_test,
                                  weight_noise_test=weight_noise_test,
                                  weight_bits=weight_bits,
-                                 b_init=b_init,
                                  trainable=trainable_conv)
             x = keras.layers.add([x, y])
 
@@ -363,7 +351,6 @@ def resnet_v2(input_shape, depth, num_classes=10, activation_bits=None, relu_dec
                               noise_test=weight_noise_test,
                               b_noise_test = bias_noise_test,
                               num_bits=weight_bits,
-                              b_init=b_init,
                               trainable=trainable_dense)(y)
 
     # Instantiate model.
