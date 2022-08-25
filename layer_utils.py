@@ -40,13 +40,14 @@ class activation_quant(Layer):
 class conv2d_noise(Layer):
     def __init__(self, num_filter, kernel_size=3, activation=None, strides=1, padding='valid',
                  noise_train=0., b_noise_train = 0., noise_test=0.,b_noise_test = 0., num_bits=None, weight_range=1., bias_range=1.,
-                 range_decay=0, **kwargs):
+                 range_decay=0, b_init, **kwargs):
         super(conv2d_noise, self).__init__(**kwargs)
         self.num_filter = num_filter
         self.b_noise_train = b_noise_train
         self.noise_train = noise_train
         self.b_noise_test = b_noise_test
         self.noise_test = noise_test
+        self.b_init = b_init
         self.kernel_size = (kernel_size, kernel_size)
         self.activation = activation
         self.strides = (strides, strides)
@@ -63,7 +64,7 @@ class conv2d_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=(self.num_filter,),
-                                    initializer='glorot_uniform')
+                                    initializer= b_init)
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
                                                 shape=[],
@@ -113,7 +114,7 @@ class conv2d_noise(Layer):
     
 class dense_noise(Layer):
     def __init__(self, output_dim, activation=None, noise_train=0., b_noise_train = 0., noise_test=0., b_noise_test = 0.,
-                 num_bits=None, weight_range=1., bias_range=1., range_decay=0, **kwargs):
+                 num_bits=None, b_init, weight_range=1., bias_range=1., range_decay=0, **kwargs):
         super(dense_noise, self).__init__(**kwargs)
         self.output_dim = output_dim
         self.b_noise_train = b_noise_train
@@ -121,6 +122,7 @@ class dense_noise(Layer):
         self.b_noise_test = b_noise_test
         self.noise_test = noise_test
         self.activation = activation
+        self.b_init = b_init
         self.num_bits = num_bits
         self.weight_range = weight_range
         self.bias_range = bias_range
@@ -133,7 +135,7 @@ class dense_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=[int(self.output_dim)],
-                                    initializer='glorot_uniform')
+                                    initializer= b_init )
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
                                                 shape=[],
