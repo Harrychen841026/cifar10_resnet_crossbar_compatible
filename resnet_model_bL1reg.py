@@ -3,8 +3,7 @@ from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, Activatio
 from tensorflow.keras.layers import AveragePooling2D, Input, Flatten
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Model
-from layer_utils_bL1reg import activation_quant, conv2d_noise, dense_noise
-
+from layer_utils_bL1reg import activation_quant, neg_bias_reg, conv2d_noise, dense_noise
 
 def resnet_layer(inputs,
                  num_filters=16,

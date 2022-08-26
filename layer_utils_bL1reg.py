@@ -3,7 +3,21 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
+from keras import backend
+import math
 
+class neg_bias_reg(Regularizer):
+    def __init__(self, reg=0.01, **kwargs):
+        reg = kwargs.pop('reg', reg) # Backwards compatibility
+        if kwargs:
+            raise TypeError(f'Arguments not recognized: {kwargs}')
+        reg = 0.01 if reg is None else reg
+        self.reg = backend.cast_to_floatx(reg)
+
+    def __call__(self, x):
+        return self.reg * tf.math.reduce_sum(x)
+    def get_config(self):
+        return {'reg' : float(self.reg)}
 
 class activation_quant(Layer):
     def __init__(self, num_bits, max_value, decay=0, **kwargs):
@@ -63,7 +77,7 @@ class conv2d_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=(self.num_filter,),
-                                    regularizer=tf.keras.regularizers.l1(l1 = self.l1),
+                                    regularizer= neg_bias_reg(self.l1),
                                     initializer= keras.initializers.Constant(0))
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
@@ -134,7 +148,7 @@ class dense_noise(Layer):
                                       initializer='glorot_uniform')
         self.bias = self.add_weight(name='bias',
                                     shape=[int(self.output_dim)],
-                                    regularizer=tf.keras.regularizers.l1(l1 = self.l1),
+                                    regularizer= neg_bias_reg(self.l1),
                                     initializer= keras.initializers.Constant(0) )
         if self.num_bits is not None:
             self.weight_range = self.add_weight(name='weight_range',
