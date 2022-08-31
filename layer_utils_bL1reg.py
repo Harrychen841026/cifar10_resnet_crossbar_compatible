@@ -5,6 +5,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
 from keras import backend
 import math
+from tensorflow.keras.regularizers import Regularizer
 
 class neg_bias_reg(Regularizer):
     def __init__(self, reg=0.01, **kwargs):
@@ -15,7 +16,7 @@ class neg_bias_reg(Regularizer):
         self.reg = backend.cast_to_floatx(reg)
 
     def __call__(self, x):
-        return self.reg * tf.math.reduce_sum(x)
+        return self.reg * tf.math.sign(tf.math.reduce_sum(x)) * tf.math.sqrt(tf.math.reduce_sum(abs(x)))
     def get_config(self):
         return {'reg' : float(self.reg)}
 

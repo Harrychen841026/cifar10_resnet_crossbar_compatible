@@ -14,7 +14,8 @@ import numpy as np
 import os
 import sys
 
-load_checkpoint = False
+#load_checkpoint = False
+load_checkpoint = True
 finetune_ckpt_path = None
 finetune = (finetune_ckpt_path is not None)
 batch_size = 128  # orig paper trained all networks with batch_size=128
@@ -54,7 +55,7 @@ else:
     bias_noise = float(sys.argv[3])
     ###
     l1 = float(sys.argv[4])
-    model_name = 'act%db_wnoise%.2f_bnoise%.2f_L1%.2f' % (activation_bits, weight_noise,bias_noise, l1)
+    model_name = 'act%db_wnoise%.2f_bnoise%.2f_L1%.6f' % (activation_bits, weight_noise,bias_noise, l1)
 
 if len(sys.argv) >= 6:
     version = int(sys.argv[5])
@@ -115,11 +116,14 @@ def lr_schedule(epoch):
     """
     lr = 1e-3
     if epoch > 180:
-        lr *= 0.5e-3
+	#lr *= 0.5e-3
+        lr *= 5e-3 
     elif epoch > 160:
-        lr *= 1e-3
-    elif epoch > 120:
+	#lr *= 1e-3
         lr *= 1e-2
+    elif epoch > 120:
+	#lr *= 1e-2
+        lr *= 5e-2
     elif epoch > 80:
         lr *= 1e-1
     print('Learning rate: ', lr)
@@ -132,10 +136,13 @@ model_full_name = 'cifar10_%s_model' % model_type
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 filepath = os.path.join(save_dir, model_full_name)
-
+check_type = 'model_checkpoint/ResNet20v1_filter16_act3b_wnoise0.00_input0.95/cifar10_ResNet20v1_filter16_act3b_wnoise0.00_input0.95_model/'
+checkpath = os.path.join(os.getcwd(), check_type)
 
 if load_checkpoint:
-  model = load_model(filepath)
+  #model = load_model(filepath)
+  model = load_model(checkpath)
+  model.compile(loss = 'categorical_crossentropy', optimizer = Adam(learning_rate = lr_schedule(0)), metrics = ['accuracy'])
 else:
   # build the graph
   if version == 2:
